@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KatChanVT Tracker</title>
+    <style>
+        :root {
+            --primary: #B6FFFD;
+            --secondary: #FF92C9;
+            --background: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .logo {
+            width: 500px;
+            margin-bottom: 20px;
+        }
+
+        .mascotte {
+            position: absolute;
+            height: 150px;
+            opacity: 0.8;
+        }
+
+        .mascotte.left {
+            left: 20px;
+            top: 20px;
+        }
+
+        .mascotte.right {
+            right: 20px;
+            top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 30px;
+            color: var(--background);
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .tab-button.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .event-list {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--background);
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+.collapse-indicator {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    margin-right: 5px;
+    width: 12px;
+    height: 12px;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0iI2ZmZiI+PHBhdGggZD0iTTEwLjc1IDMuNTEwMDVMMC4yNSA1LjA0OTk3TDQuNCAxMS41MDAyTDEyIDAuNzQ5OTg0TDExLjI1IDAuMjg5OTg0TDQuNCA5Ljc0OTk4NEwxLjE4IDUuODA5OTdMMTAuNzUgMy41MTAwNVoiLz48L3N2Zz4=');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.collapse-indicator.active {
+    transform: rotate(90deg);
+}
+
+tr[data-has-details]:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+    cursor: pointer;
+}
+
+.gift-details {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.gift-details-row {
+    display: none;
+}
+
+.gift-details-row.active {
+    display: table-row;
+}
+
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .tier-1 { background: #3a3a3a; }
+        .tier-2 { background: var(--primary); color: var(--background); }
+        .tier-3 { background: var(--secondary); color: var(--background); }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-button {
+            background: var(--primary);
+            color: var(--background);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .page-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+     
+      
+    .date-filter {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        align-items: center;
+    }
+
+    .date-input {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid var(--primary);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .filter-button {
+        padding: 8px 20px;
+        background: var(--secondary);
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .filter-button:hover {
+        transform: scale(1.05);
+    }
+    .filter-button.reset-button {
+        background: var(--primary);
+        margin-left: 10px;
+    }
+
+    .filter-button.reset-button:hover {
+        background: #9bfffc;
+    }
+        
+  .total-dons-info {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(182, 255, 253, 0.3);
+    color: var(--background);
+}
+
+
+        </style>
+</head>
+<body>
+    <img src="images/MascotteKCABleue.png" class="mascotte left">
+    <img src="images/MascotteKCARose.png" class="mascotte right">
+
+    <div class="header">
+        <img src="images/Kat-Chan-logo.png" class="logo" alt="KatChanVT">
+        <h1>Suivi des Activités</h1>
+    </div>
+
+    <!-- tabs -->
+    <div class="tabs">
+        <button class="tab-button active" data-tab="subs" onclick="showTab('subs')">Abonnements</button>
+        <button class="tab-button" data-tab="bits" onclick="showTab('bits')">Bits</button>
+        <button class="tab-button" data-tab="dons" onclick="showTab('dons')">Dons</button>
+        <button class="tab-button" data-tab="top" onclick="showTab('top')">Top</button> <!-- Nouveau bouton "Top" -->
+    </div>
+    
+
+    <!-- tabs content -->
+    <div id="subs-content" class="tab-content active">
+        <div class="event-list">
+            <h2>Abonnements récents</h2>
+            <table id="subs">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Utilisateur</th>
+                        <th>Tier</th>
+                        <th>Mois</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="page-button" id="prev-page-subs" onclick="changePage('subs', -1)">Précédent</button>
+                <span id="page-number-subs"></span>
+                <button class="page-button" id="next-page-subs" onclick="changePage('subs', 1)">Suivant</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bits-content" class="tab-content">
+        <div class="event-list">
+            <h2>Bits récents</h2>
+            <table id="bits">
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Montant</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="page-button" id="prev-page-bits" onclick="changePage('bits', -1)">Précédent</button>
+                <span id="page-number-bits"></span>
+                <button class="page-button" id="next-page-bits" onclick="changePage('bits', 1)">Suivant</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dons-content" class="tab-content">
+        <div class="event-list">
+            <h2>Dons récents</h2>
+            <table id="dons">
+                <thead>
+                    <tr>
+                        <th>Donateur</th>
+                        <th>Montant</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="page-button" id="prev-page-dons" onclick="changePage('dons', -1)">Précédent</button>
+                <span id="page-number-dons"></span>
+                <button class="page-button" id="next-page-dons" onclick="changePage('dons', 1)">Suivant</button>
+            </div>
+        </div>
+    </div>
+
+   <div id="top-content" class="tab-content">
+    <div class="event-list">
+        <div class="date-filter">
+            <input type="date" id="start-date" class="date-input">
+            <input type="date" id="end-date" class="date-input">
+            <button onclick="applyDateFilter()" class="filter-button">Filtrer</button>
+            <button onclick="resetDateFilter()" class="filter-button reset-button">Reset</button>
+        </div>
+
+       <div id="total-dons" class="total-dons-info">
+        <!-- Dynamic content -->
+        </div>
+        <div id="total" class="total-dons-info" style="margin-top:10px;">
+            <!-- Dynamic content -->
+        </div>
+
+        <h2>Top 3 des Donateurs</h2>
+
+        <!-- Top Subs -->
+        <h3>Top 3 des Abonnements</h3>
+        <table id="top-subs">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Subs Offerts</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic content -->
+            </tbody>
+        </table>
+
+        <!-- Top Bits -->
+        <h3>Top 3 des Bits</h3>
+        <table id="top-bits">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Total Bits</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic content -->
+            </tbody>
+        </table>
+
+        <!-- Top Dons -->
+        <h3>Top 3 des Dons</h3>
+        <table id="top-dons">
+            <thead>
+                <tr>
+                    <th>Donateurs</th>
+                    <th>Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic content -->
+            </tbody>
+        </table>
+       
+    </div>
+</div>
+
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        async function getFirebaseConfig() {
+    const res = await fetch('/api/getFirebaseConfig');
+    if (!res.ok) throw new Error("Problème API");
+
+    return await res.json();
+}
+let db
+
+getFirebaseConfig().then(firebaseConfig => {
+    firebase.initializeApp(firebaseConfig);   
+    db = firebase.firestore(); 
+    init();
+
+});
+        
+
+       
+        const itemsPerPage = 20;
+        let currentPageSubs = 1, currentPageBits = 1, currentPageDons = 1;
+        let subsData = [], bitsData = [], donsData = [];
+
+      
+        function initializeTabs() {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tabName = e.target.getAttribute('data-tab');
+                    showTab(tabName);
+                });
+            });
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            const targetContent = document.getElementById(`${tabName}-content`);
+            const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
+            
+            if (targetContent && targetButton) {
+                targetContent.classList.add('active');
+                targetButton.classList.add('active');
+            }
+           if (tabName === 'top') {
+        loadTopData();
+    } else if (!this.currentTab) { 
+        loadData();
+    }
+    this.currentTab = tabName;
+        }
+
+        initializeTabs();
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate();
+            return date.toLocaleString('fr-FR', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+        }
+
+        async function getSubscriptionDuration(userName, timestamp) {
+            const messagesSnapshot = await db.collection('messages')
+                .where('user_name', '==', userName)
+                .where('timestamp', '>=', new Date(timestamp - 60000))
+                .where('timestamp', '<=', new Date(timestamp + 60000))
+                .get();
+
+            if (!messagesSnapshot.empty) {
+                const message = messagesSnapshot.docs[0].data();
+                return message.duration_months || 1;
+            }
+            return 1;
+        }
+
+        function processSubsAndGifts(subs, gifts) {
+            const groupedData = [];
+            const allEvents = [
+                ...subs.map(sub => ({ ...sub, type: 'sub' })),
+                ...gifts.map(gift => ({ ...gift, type: 'gift' }))
+            ];
+            allEvents.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
+
+            let currentGroup = [];
+            for (let i = 0; i < allEvents.length; i++) {
+                const event = allEvents[i];
+                if (currentGroup.length === 0 || 
+                    event.timestamp.toMillis() - currentGroup[0].timestamp.toMillis() <= 10000) {
+                    currentGroup.push(event);
+                } else {
+                    processGroup(currentGroup, groupedData);
+                    currentGroup = [event];
+                }
+            }
+
+            if (currentGroup.length > 0) {
+                processGroup(currentGroup, groupedData);
+            }
+
+            groupedData.sort((a, b) => b.timestamp - a.timestamp);
+            return groupedData;
+        }
+
+        function processGroup(group, groupedData) {
+            const giftsInGroup = group.filter(event => event.type === 'gift');
+            const subsInGroup = group.filter(event => event.type === 'sub');
+
+            if (giftsInGroup.length > 0) {
+                giftsInGroup.forEach(gift => {
+                    const relatedSubs = subsInGroup.filter(sub => 
+                        sub.is_gift && 
+                        sub.timestamp.toMillis() - gift.timestamp.toMillis() <= 10000
+                    );
+
+                    if (relatedSubs.length > 0) {
+                        groupedData.push({
+                            type: 'gift',
+                            user_name: gift.user_name,
+                            total: gift.total,
+                            tier: 'Multiple',
+                            timestamp: gift.timestamp,
+                            details: relatedSubs.map(sub => ({
+                                receiver: sub.user_name,
+                                tier: parseInt(sub.tier) / 1000
+                            }))
+                        });
+                    }
+                });
+            } else {
+                subsInGroup.forEach(sub => {
+                    if (!sub.is_gift) {
+                        groupedData.push({
+                            type: 'sub',
+                            user_name: sub.user_name,
+                            tier: parseInt(sub.tier) / 1000,
+                            timestamp: sub.timestamp,
+                            details: []
+                        });
+                    }
+                });
+            }
+        }
+
+        async function renderSubsAndGifts(data, page, type) {
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedData = data.slice(start, end);
+
+    const tbody = document.querySelector(`#${type} tbody`);
+    tbody.innerHTML = '';
+
+    for (const item of paginatedData) {
+        const duration = item.type === 'sub' ? await getSubscriptionDuration(item.user_name, item.timestamp.toMillis()) : '';
+        
+        const hasDetails = item.type === 'gift' && item.details?.length > 0;
+
+        // Ligne principale
+        const mainRow = `
+            <tr ${hasDetails ? 'data-has-details onclick="toggleGiftDetails(this)"' : ''}>
+                <td>${item.type === 'gift' ? '🎁' : '⭐'}</td>
+                <td>${item.user_name}</td>
+                <td><span class="badge tier-${item.tier}">Tier ${item.tier}</span></td>
+                <td>${item.type === 'gift' ? `x${item.total}` : duration}</td>
+                <td>${formatDate(item.timestamp)}</td>
+            </tr>
+        `;
+
+        const detailsRow = item.details && item.details.length > 0 ? `
+            <tr class="gift-details-row">
+                <td colspan="5">
+                    <div class="gift-details">
+                        ${item.details.map(d => `
+                            <div>🎀  ${d.receiver} 
+                                <span class="badge tier-${d.tier}">Tier ${d.tier}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </td>
+            </tr>
+        ` : '';
+
+        tbody.innerHTML += mainRow + detailsRow;
+    }
+
+    updatePaginationControls(page, data.length, type);
+}
+
+
+        function updatePaginationControls(page, totalItems, type) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            document.getElementById(`page-number-${type}`).textContent = `Page ${page} sur ${totalPages}`;
+            document.getElementById(`prev-page-${type}`).disabled = page === 1;
+            document.getElementById(`next-page-${type}`).disabled = page >= totalPages;
+        }
+
+async function changePage(type, direction) {
+    if (type === 'subs') {
+        currentPageSubs = Math.max(1, currentPageSubs + direction);
+        renderSubsAndGifts(subsData, currentPageSubs, 'subs');
+    } else if (type === 'bits') {
+        currentPageBits = Math.max(1, currentPageBits + direction);
+        renderTable(bitsData, currentPageBits, 'bits');
+    } else if (type === 'dons') {
+        currentPageDons = Math.max(1, currentPageDons + direction);
+        renderTableDons(donsData, currentPageDons, 'dons');
+    }
+}
+function toggleGiftDetails(row) {
+    const detailsRow = row.nextElementSibling;
+    detailsRow.classList.toggle('active');
+
+    const indicator = row.querySelector('.collapse-indicator');
+    if (indicator) {
+        indicator.classList.toggle('active');
+    }
+}
+
+
+function renderTableDons(data, page, type) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            const tbody = document.querySelector(`#${type} tbody`);
+            tbody.innerHTML = '';
+
+            paginatedData.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.donor || 'Anonyme'}</td>
+                        <td>${item.bits || item.amount}${item.currency || ''}</td>
+                        <td>${formatDate(item.timestamp)}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            updatePaginationControls(page, data.length, type);
+        }
+        function renderTable(data, page, type) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            const tbody = document.querySelector(`#${type} tbody`);
+            tbody.innerHTML = '';
+
+            paginatedData.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.user_name || 'Anonyme'}</td>
+                        <td>${item.bits || item.amount}${item.currency || ''}</td>
+                        <td>${formatDate(item.timestamp)}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            updatePaginationControls(page, data.length, type);
+        }
+        
+
+// Fonction to show top data
+let currentStartDate = null;
+let currentEndDate = null;
+function resetDateFilter() {
+    document.getElementById('start-date').value = '';
+    document.getElementById('end-date').value = '';
+    currentStartDate = null;
+    currentEndDate = null;
+    loadTopData();
+}
+
+async function applyDateFilter() {
+    const start = document.getElementById('start-date').value;
+    const end = document.getElementById('end-date').value;
+    
+    // Dates validation
+    if (start && end && new Date(start) > new Date(end)) {
+        alert("La date de fin doit être postérieure à la date de début !");
+        return;
+    }
+    
+    currentStartDate = start ? firebase.firestore.Timestamp.fromDate(new Date(start)) : null;
+    currentEndDate = end ? firebase.firestore.Timestamp.fromDate(new Date(end + 'T23:59:59')) : null;
+    
+    await loadTopData();
+}
+
+async function loadTopData() {
+    let subsQuery = db.collection('subs');
+    let giftsQuery = db.collection('gifts');
+    let bitsQuery = db.collection('cheers');
+    let donsQuery = db.collection('dons');
+
+    // Apply filters
+if (currentStartDate && currentEndDate) {
+    subsQuery = subsQuery.where('timestamp', '>=', currentStartDate)
+                         .where('timestamp', '<=', currentEndDate);
+    giftsQuery = giftsQuery.where('timestamp', '>=', currentStartDate)
+                           .where('timestamp', '<=', currentEndDate);
+    bitsQuery = bitsQuery.where('timestamp', '>=', currentStartDate)
+                         .where('timestamp', '<=', currentEndDate);
+    donsQuery = donsQuery.where('timestamp', '>=', currentStartDate)
+                         .where('timestamp', '<=', currentEndDate);
+} else if (currentStartDate) {
+    subsQuery = subsQuery.where('timestamp', '>=', currentStartDate);
+    giftsQuery = giftsQuery.where('timestamp', '>=', currentStartDate);
+    bitsQuery = bitsQuery.where('timestamp', '>=', currentStartDate);
+    donsQuery = donsQuery.where('timestamp', '>=', currentStartDate);
+} else if (currentEndDate) {
+    subsQuery = subsQuery.where('timestamp', '<=', currentEndDate);
+    giftsQuery = giftsQuery.where('timestamp', '<=', currentEndDate);
+    bitsQuery = bitsQuery.where('timestamp', '<=', currentEndDate);
+    donsQuery = donsQuery.where('timestamp', '<=', currentEndDate);
+}
+
+
+    const [subsSnapshot, giftsSnapshot, bitsSnapshot, donsSnapshot] = await Promise.all([
+        subsQuery.get(),
+        giftsQuery.get(),
+        bitsQuery.get(),
+        donsQuery.get()
+    ]);
+
+    
+    const subsData = subsSnapshot.docs.map(doc => doc.data());
+    const giftsData = giftsSnapshot.docs.map(doc => doc.data());
+    const bitsData = bitsSnapshot.docs.map(doc => doc.data());
+    const donsData = donsSnapshot.docs.map(doc => doc.data());
+
+    const topSubs = calculateTopSubs(subsData, giftsData);
+    const topBits = calculateTopBits(bitsData);
+    const topDons = calculateTopDons(donsData);
+
+    renderTopSubs(topSubs);
+    renderTopBits(topBits);
+    renderTopDons(topDons);
+
+    const totalDons = donsData.reduce((acc, don) => acc + (Number(don.amount) || 0), 0);
+    document.getElementById('total-dons').innerHTML = `<h3>Total des dons: ${totalDons.toFixed(2)} €</h3>`;
+
+    // --- Calculate totals ---
+    // Bits
+    const totalBits = bitsData.reduce((acc, bit) => acc + (Number(bit.bits) * 0.0152 || 0), 0);
+
+    // Classics Subs
+    const totalSubs = subsData.reduce((acc, sub) => {
+        if (sub.is_gift) return acc;  
+        let tier = parseInt(sub.tier) / 1000;
+        if (tier === 1) return acc + 3.99;
+        else if (tier === 2) return acc + 7.99;
+        else if (tier === 3) return acc + 19.99;
+        return acc;
+    }, 0);
+
+    // Gifts
+        const totalGifts = giftsData.reduce((acc, gift) => {
+        let tier = parseInt(gift.tier) / 1000;
+        let multiplier = 0;
+        if (tier === 1) multiplier = 3.99;
+        else if (tier === 2) multiplier = 7.99;
+        else if (tier === 3) multiplier = 19.99;
+        return acc + ((Number(gift.total) || 0) * multiplier);
+    }, 0);
+
+    // Total Global
+    const totalGlobal = totalDons + totalBits + totalSubs + totalGifts;
+
+
+    document.getElementById('total').innerHTML = `<h3>Total global: ${totalGlobal.toFixed(2)} €</h3>`;
+}
+
+
+
+
+function calculateTopSubs(subsData, giftsData) {
+    const filteredSubs = subsData.filter(sub =>
+        (!currentStartDate || sub.timestamp >= currentStartDate) &&
+        (!currentEndDate || sub.timestamp <= currentEndDate)
+    );
+    const filteredGifts = giftsData.filter(gift =>
+        (!currentStartDate || gift.timestamp >= currentStartDate) &&
+        (!currentEndDate || gift.timestamp <= currentEndDate)
+    );
+
+    const totals = {};
+
+    filteredSubs.forEach(sub => {
+        if (!sub.is_gift) {
+            totals[sub.user_name] = (totals[sub.user_name] || 0) + 1;
+        }
+    });
+
+    filteredGifts.forEach(gift => {
+        totals[gift.user_name] = (totals[gift.user_name] || 0) + (gift.total || 0);
+    });
+
+    let arr = Object.entries(totals)
+        .map(([userName, total]) => ({ userName, total }))
+        .sort((a, b) => b.total - a.total);
+
+    if (arr.length <= 3) return arr;
+
+    const thirdTotal = arr[2].total;
+    const groups = {};
+    arr.forEach(entry => {
+        if (entry.total >= thirdTotal) {
+            groups[entry.total] = groups[entry.total] || [];
+            groups[entry.total].push(entry.userName);
+        }
+    });
+
+    const result = [];
+    Object.keys(groups)
+        .map(total => Number(total))
+        .sort((a, b) => b - a)
+        .forEach(total => {
+            const names = groups[total];
+            const mainEntry = { userName: names[0], total: total };
+            if (names.length > 1) {
+                mainEntry.details = names.slice(1).map(name => ({ userName: name, total: total }));
+            }
+            result.push(mainEntry);
+        });
+    return result;
+}
+
+
+function calculateTopBits(bits) {
+    const filteredBits = bits.filter(bit =>
+        (!currentStartDate || bit.timestamp >= currentStartDate) &&
+        (!currentEndDate || bit.timestamp <= currentEndDate)
+    );
+    const totals = {};
+    filteredBits.forEach(bit => {
+        totals[bit.user_name] = (totals[bit.user_name] || 0) + bit.bits;
+    });
+
+    let arr = Object.entries(totals)
+        .map(([userName, total]) => ({ userName, total }))
+        .sort((a, b) => b.total - a.total);
+
+    if (arr.length <= 3) return arr;
+    const thirdTotal = arr[2].total;
+    const groups = {};
+    arr.forEach(entry => {
+        if (entry.total >= thirdTotal) {
+            groups[entry.total] = groups[entry.total] || [];
+            groups[entry.total].push(entry.userName);
+        }
+    });
+
+    const result = [];
+    Object.keys(groups)
+        .map(total => Number(total))
+        .sort((a, b) => b - a)
+        .forEach(total => {
+            const names = groups[total];
+            const mainEntry = { userName: names[0], total: total };
+            if (names.length > 1) {
+                mainEntry.details = names.slice(1).map(name => ({ userName: name, total: total }));
+            }
+            result.push(mainEntry);
+        });
+    return result;
+}
+
+
+function calculateTopDons(dons) {
+    const filtereddons = dons.filter(don =>
+        (!currentStartDate || don.timestamp >= currentStartDate) &&
+        (!currentEndDate || don.timestamp <= currentEndDate)
+    );
+    const donorTotals = {};
+
+    filtereddons.forEach(don => {
+        donorTotals[don.donor] = donorTotals[don.donor] || 0;
+        donorTotals[don.donor] += don.amount;
+    });
+
+    let donorArray = Object.entries(donorTotals)
+        .map(([donor, total]) => ({ donor, total }))
+        .sort((a, b) => b.total - a.total);
+
+    if (donorArray.length <= 3) return donorArray;
+
+    const thirdTotal = donorArray[2].total;
+
+    const groups = {};
+    donorArray.forEach(entry => {
+        if (entry.total >= thirdTotal) {
+            groups[entry.total] = groups[entry.total] || [];
+            groups[entry.total].push(entry.donor);
+        }
+    });
+
+
+    const result = [];
+    Object.keys(groups)
+        .map(total => Number(total))
+        .sort((a, b) => b - a)
+        .forEach(total => {
+            const donors = groups[total];
+            const mainEntry = { donor: donors[0], total: total };
+            if (donors.length > 1) {
+                mainEntry.details = donors.slice(1).map(d => ({ donor: d, total: total }));
+            }
+            result.push(mainEntry);
+        });
+
+    return result;
+}
+
+
+// Shows top 3
+function renderTopSubs(topSubs) {
+    const tbody = document.querySelector('#top-subs tbody');
+    tbody.innerHTML = '';
+
+    topSubs.forEach(item => {
+        const allNames = [item.userName];
+        if (item.details && item.details.length > 0) {
+            item.details.forEach(entry => allNames.push(entry.userName));
+        }
+        const nb = allNames.length;
+        const isGroup = nb > 1;
+
+        let cellContent = '';
+        if (!isGroup) {
+            cellContent = `<strong>${allNames[0]}</strong>`;
+        } else {
+            cellContent = `
+                <span class="collapse-indicator"></span>
+                <strong>${item.total}</strong>
+                <br>
+                <em>${nb} abonnés</em>
+            `;
+        }
+        const mainRow = `
+            <tr ${isGroup ? 'data-has-details onclick="toggleGiftDetails(this)"' : ''}>
+                <td>${cellContent}</td>
+                <td><strong>${item.total}</strong></td>
+            </tr>
+        `;
+        let detailsRow = '';
+        if (isGroup) {
+            const detailsContent = allNames
+                .map(name => `<div>${name} - ${item.total}</div>`)
+                .join('');
+            detailsRow = `
+                <tr class="gift-details-row">
+                    <td colspan="2">
+                        <div class="gift-details">
+                            ${detailsContent}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+        tbody.innerHTML += mainRow + detailsRow;
+    });
+}
+
+
+function renderTopBits(topBits) {
+    const tbody = document.querySelector('#top-bits tbody');
+    tbody.innerHTML = '';
+
+    topBits.forEach(item => {
+        const allNames = [item.userName];
+        if (item.details && item.details.length > 0) {
+            item.details.forEach(entry => allNames.push(entry.userName));
+        }
+        const nb = allNames.length;
+        const isGroup = nb > 1;
+
+        let cellContent = '';
+        if (!isGroup) {
+            cellContent = `<strong>${allNames[0]}</strong>`;
+        } else {
+            cellContent = `
+                <span class="collapse-indicator"></span>
+                <strong>${item.total}</strong>
+                <br>
+                <em>${nb} contributeurs</em>
+            `;
+        }
+        const mainRow = `
+            <tr ${isGroup ? 'data-has-details onclick="toggleGiftDetails(this)"' : ''}>
+                <td>${cellContent}</td>
+                <td><strong>${item.total}</strong></td>
+            </tr>
+        `;
+        let detailsRow = '';
+        if (isGroup) {
+            const detailsContent = allNames
+                .map(name => `<div>${name} - ${item.total}</div>`)
+                .join('');
+            detailsRow = `
+                <tr class="gift-details-row">
+                    <td colspan="2">
+                        <div class="gift-details">
+                            ${detailsContent}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+        tbody.innerHTML += mainRow + detailsRow;
+    });
+}
+
+
+function renderTopDons(topDons) {
+    const tbody = document.querySelector('#top-dons tbody');
+    tbody.innerHTML = '';
+
+    topDons.forEach(item => {
+        const allDonors = [item.donor];
+        if (item.details && item.details.length > 0) {
+            item.details.forEach(d => allDonors.push(d.donor));
+        }
+        const nbDonors = allDonors.length;
+
+        let cellContent = '';
+        let hasDetails = nbDonors > 1; 
+
+        if (!hasDetails) {
+            cellContent = `<strong>${allDonors[0]}</strong>`;
+        } 
+        else {
+            cellContent = `
+                <span class="collapse-indicator"></span>
+                <strong>${item.total} €</strong>
+                <br>
+                <em>${nbDonors} donateur${nbDonors > 1 ? 's' : ''}</em>
+            `;
+        }
+
+        const mainRow = `
+            <tr ${hasDetails ? 'data-has-details onclick="toggleGiftDetails(this)"' : ''}>
+                <td>${cellContent}</td>
+                <td><strong>${item.total} €</strong></td>
+            </tr>
+        `;
+
+        let detailsRow = '';
+        if (hasDetails) {
+            const detailsContent = allDonors
+                .map(donorName => `<div>${donorName} - ${item.total} €</div>`)
+                .join('');
+            detailsRow = `
+                <tr class="gift-details-row">
+                    <td colspan="2">
+                        <div class="gift-details">
+                            ${detailsContent}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        tbody.innerHTML += mainRow + detailsRow;
+    });
+}
+
+
+        // Load initial data
+async function loadData() {
+    // Subs and gifts
+    const [subsSnapshot, giftsSnapshot, bitsSnapshot, donsSnapshot] = await Promise.all([
+        db.collection('subs').orderBy('timestamp', 'desc').limit(100).get(),
+        db.collection('gifts').orderBy('timestamp', 'desc').limit(100).get(),
+        db.collection('cheers').orderBy('timestamp', 'desc').limit(100).get(),
+        db.collection('dons').orderBy('timestamp', 'desc').limit(100).get()
+    ]);
+
+    subsData = processSubsAndGifts(
+        subsSnapshot.docs.map(doc => doc.data()),
+        giftsSnapshot.docs.map(doc => doc.data())
+    );
+    renderSubsAndGifts(subsData, currentPageSubs, 'subs');
+
+    bitsData = bitsSnapshot.docs.map(doc => doc.data());
+    renderTable(bitsData, currentPageBits, 'bits');
+
+    donsData = donsSnapshot.docs.map(doc => doc.data());
+    renderTableDons(donsData, currentPageDons, 'dons');
+}
+        // Global init
+        function init() {
+            initializeTabs();
+            loadData();
+            loadTopData();
+
+        }
+
+        </script>
+</body>
+</html>
